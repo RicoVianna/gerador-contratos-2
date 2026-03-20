@@ -100,7 +100,7 @@ function validateForm(form) {
 function buildPrestacaoServicos(d) {
     const qualContratante = buildQualificacao(d, 'contratante', 'CONTRATANTE');
     const qualContratado = buildQualificacao(d, 'contratado', 'CONTRATADO');
-    const n = d.clausulas && d.clausulas.trim() ? 8 : 7;
+    const n = d.clausulas && d.clausulas.trim() ? 9 : 8;
 
     return `
         <h1>Contrato de Prestação de Serviços</h1>
@@ -210,7 +210,7 @@ function buildPrestacaoServicos(d) {
 function buildCompraVenda(d) {
     const qualComprador = buildQualificacao(d, 'contratante', 'COMPRADOR');
     const qualVendedor = buildQualificacao(d, 'contratado', 'VENDEDOR');
-    const n = d.clausulas && d.clausulas.trim() ? 8 : 7;
+    const n = d.clausulas && d.clausulas.trim() ? 9 : 8;
 
     const estadoBem = d.estado_bem ? d.estado_bem.trim() : '';
     const localEntrega = d.local_entrega && d.local_entrega.trim() ? d.local_entrega.trim() : val(d, 'local');
@@ -317,38 +317,35 @@ function buildCompraVenda(d) {
 }
 
 // ---- Shared signatures block ----
-function buildSignatures(d, rolaA, rolaB, prefixA, prefixB) {
+function buildSignatures(d, roleA, roleB, prefixA, prefixB) {
+    const nomeA = d[prefixA + '_nome'] || "___________________________";
+    const nomeB = d[prefixB + '_nome'] || "___________________________";
+
     return `
-        <div class="signatures">
-            <div class="sig-block">
-                <div class="sig-space"></div>
+        <div class="signatures-wrapper">
+            <div class="sig-line-container">
                 <div class="sig-line"></div>
-                <div class="sig-name">${val(d, prefixA + '_nome')}</div>
-                <div class="sig-detail">${rolaA}</div>
-                <div class="sig-detail">CPF/CNPJ: ${val(d, prefixA + '_cpf')}</div>
+                <div class="sig-name">${nomeA}</div>
+                <div class="sig-role">${roleA}</div>
             </div>
-            <div class="sig-block">
-                <div class="sig-space"></div>
+
+            <div class="sig-line-container">
                 <div class="sig-line"></div>
-                <div class="sig-name">${val(d, prefixB + '_nome')}</div>
-                <div class="sig-detail">${rolaB}</div>
-                <div class="sig-detail">CPF/CNPJ: ${val(d, prefixB + '_cpf')}</div>
+                <div class="sig-name">${nomeB}</div>
+                <div class="sig-role">${roleB}</div>
             </div>
-        </div>
-        <div class="witnesses">
-            <p class="witnesses-label">Testemunhas:</p>
-            <div class="witness-grid">
-                <div class="sig-block">
-                    <div class="sig-space"></div>
-                    <div class="sig-line"></div>
-                    <div class="sig-detail">Nome:</div>
-                    <div class="sig-detail">CPF:</div>
-                </div>
-                <div class="sig-block">
-                    <div class="sig-space"></div>
-                    <div class="sig-line"></div>
-                    <div class="sig-detail">Nome:</div>
-                    <div class="sig-detail">CPF:</div>
+
+            <div style="margin-top: 20px;">
+                <p><strong>Testemunhas:</strong></p>
+                <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+                    <div style="width: 45%; text-align: center;">
+                        <div style="border-top: 1px solid #000; margin-bottom: 5px;"></div>
+                        <p style="font-size: 0.8rem;">Nome e CPF</p>
+                    </div>
+                    <div style="width: 45%; text-align: center;">
+                        <div style="border-top: 1px solid #000; margin-bottom: 5px;"></div>
+                        <p style="font-size: 0.8rem;">Nome e CPF</p>
+                    </div>
                 </div>
             </div>
         </div>

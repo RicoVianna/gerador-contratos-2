@@ -409,3 +409,73 @@ body {
         width: 100%;
     }
 }
+
+/* ===== ESTILIZAÇÃO DO CONTRATO GERADO (IMPRESSÃO/VISUALIZAÇÃO) ===== */
+
+/* Bloco que envolve cada seção (Contratante, Objeto, etc) */
+.meta-block {
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+}
+
+/* Títulos das seções (CONTRATANTE, CONTRATADO, OBJETO...) */
+.meta-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000;
+    border-bottom: 2px solid #000;
+    margin-bottom: 1rem;
+    display: block;
+    padding-bottom: 4px;
+}
+
+/* Espaçamento entre as cláusulas */
+.clause {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+/* Título da Cláusula (Cláusula 1ª — Do Objeto) */
+.clause-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Espaçamento entre parágrafos de texto */
+.clause p {
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+}
+
+/* Container das Assinaturas */
+.signatures-wrapper {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.sig-line-container {
+    text-align: center;
+    width: 350px;
+    margin: 0 auto;
+}
+
+.sig-line {
+    border-top: 1px solid #000;
+    margin-bottom: 8px;
+}
+
+.sig-name {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.sig-role {
+    font-size: 0.85rem;
+    color: #333;
+}
