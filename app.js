@@ -549,142 +549,143 @@ if (cepContratante) applyCepMask(cepContratante);
 if (cepContratado) applyCepMask(cepContratado);
 
 // ---- BUSCAR CEP VIA API ----
+// --- 1. BUSCAR ENDEREÇO VIA API (VIACEP) ---
 async function buscarCep(cep, prefixo) {
     const cepLimpo = cep.replace(/\D/g, '');
-
     if (cepLimpo.length !== 8) return;
 
     try {
         const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
         const data = await res.json();
-
         if (data.erro) return;
 
-        byId(prefixo + '_rua').value = data.logradouro || '';
-        byId(prefixo + '_bairro').value = data.bairro || '';
-        byId(prefixo + '_cidade').value = data.localidade || '';
-        byId(prefixo + '_estado').value = data.uf || '';
+        const rua = document.getElementById(prefixo + '_rua');
+        const bairro = document.getElementById(prefixo + '_bairro');
+        const cidade = document.getElementById(prefixo + '_cidade');
+        const estado = document.getElementById(prefixo + '_estado');
 
+        if (rua) rua.value = data.logradouro || '';
+        if (bairro) bairro.value = data.bairro || '';
+        if (cidade) cidade.value = data.localidade || '';
+        if (estado) estado.value = data.uf || '';
     } catch (e) {
-        console.log('Erro ao buscar CEP');
+        console.error('Erro ao buscar CEP');
     }
 }
 
+// Vincula o evento de busca ao sair do campo (blur)
 if (cepContratante) {
-    cepContratante.addEventListener('blur', (e) => {
-        buscarCep(e.target.value, 'contratante');
-    });
+    cepContratante.addEventListener('blur', (e) => buscarCep(e.target.value, 'contratante'));
 }
-
 if (cepContratado) {
-    cepContratado.addEventListener('blur', (e) => {
-        buscarCep(e.target.value, 'contratado');
-    });
+    cepContratado.addEventListener('blur', (e) => buscarCep(e.target.value, 'contratado'));
 }
 
-// Função para aplicar máscaras
+// --- 2. MOTOR DE MÁSCARAS E INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     
     const applyMask = (input, method) => {
         input.addEventListener('input', e => {
             e.target.value = method(e.target.value);
+            // Chama o cálculo para qualquer campo numérico alterado
+            executarCalculo();
         });
     };
 
-    // Máscara CPF/CNPJ (Dinâmica)
     const cpfCnpjMask = v => {
         v = v.replace(/\D/g, "");
         if (v.length <= 11) {
-            return v.replace(/(\={10})/, "").replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "\$1.\$2.\$3-\$4");
+            return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "$1.$2.$3-$4");
         } else {
-            return v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g, "\$1.\$2.\$3/\$4-\$5");
+            return v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g, "$1.$2.$3/$4-$5");
         }
     };
 
-    // Máscara RG (00.000.000-0)
     const rgMask = v => {
-        v = v.replace(/\D/g, "");
+        v = v.replace(/\D/g, "").substring(0, 9);
         return v.replace(/(\d{2})(\d{3})(\d{3})(\d{1})$/, "$1.$2.$3-$4");
     };
 
-    // Aplicando nos campos
+    const moneyMask = v => {
+        v = v.replace(/\D/g, "");
+        let value = (v / 100).toFixed(2);
+        return value.replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    };
+
+    // Aplica as máscaras
     document.querySelectorAll('.mask-cpf-cnpj').forEach(el => applyMask(el, cpfCnpjMask));
     document.querySelectorAll('.mask-rg').forEach(el => applyMask(el, rgMask));
-});
-
-// Lógica de Janelas e Cálculos de Pagamento
-document.addEventListener('change', function(e) {
-    const totalInput = document.getElementById('valor');
-    const fPagamento = document.getElementById('forma_pagamento').value;
-    const tParcelado = document.getElementById('tipo_parcelado').value;
+    document.querySelectorAll('.mask-money').forEach(el => applyMask(el, moneyMask));
     
-    // 1. Controle de Visibilidade das Janelas
-    document.getElementById('win_avista').style.display = (fPagamento === 'avista') ? 'block' : 'none';
-    document.getElementById('win_aprazo').style.display = (fPagamento === 'aprazo') ? 'block' : 'none';
-    document.getElementById('win_parcelado').style.display = (fPagamento === 'parcelado') ? 'block' : 'none';
+    // Adiciona ouvinte para o campo de quantidade (que não tem máscara mas afeta o cálculo)
+    const qtdInput = document.getElementById('qtd_parcelas');
+    if (qtdInput) qtdInput.addEventListener('input', executarCalculo);
+    // --- 3. CONTROLE DE JANELAS (PAGAMENTO E PARCELAMENTO) ---
+    // Este bloco garante que os campos apareçam e sumam corretamente
+    document.addEventListener('change', (e) => {
+        const idsAlvo = ['forma_pagamento', 'tipo_parcelamento'];
+        if (!idsAlvo.includes(e.target.id)) return;
 
-    // 2. Controle do campo Entrada
-    document.getElementById('group_entrada').style.display = (tParcelado === 'com_entrada') ? 'block' : 'none';
+        const valPagamento = document.getElementById('forma_pagamento').value;
+        const valTipoParcela = document.getElementById('tipo_parcelamento').value;
 
-    // 3. Função de Cálculo
-    executarCalculo();
-});
+        const wAvista = document.getElementById('wrapper_avista');
+        const wAprazo = document.getElementById('wrapper_aprazo');
+        const wParcelado = document.getElementById('wrapper_parcelado');
+        const colEntrada = document.getElementById('col_entrada');
 
-// Listener para o usuário digitar a quantidade ou entrada e o cálculo atualizar na hora
-// 1. Monitora mudanças para mostrar/esconder as janelas e atualizar cálculos
-document.addEventListener('change', function(e) {
-    const formaPagamento = document.getElementById('forma_pagamento').value;
-    const tipoParcelamento = document.getElementById('tipo_parcelamento').value;
+        // Mostra/Esconde as seções principais baseada na Forma de Pagamento
+        if (wAvista) wAvista.style.display = (valPagamento === 'avista') ? 'block' : 'none';
+        if (wAprazo) wAprazo.style.display = (valPagamento === 'aprazo') ? 'block' : 'none';
+        if (wParcelado) wParcelado.style.display = (valPagamento === 'parcelado') ? 'block' : 'none';
 
-    // Lógica para mostrar/esconder as janelas (Wrappers)
-    if (document.getElementById('wrapper_avista')) {
-        document.getElementById('wrapper_avista').style.display = (formaPagamento === 'avista') ? 'block' : 'none';
-    }
-    if (document.getElementById('wrapper_aprazo')) {
-        document.getElementById('wrapper_aprazo').style.display = (formaPagamento === 'aprazo') ? 'block' : 'none';
-    }
-    if (document.getElementById('wrapper_parcelado')) {
-        document.getElementById('wrapper_parcelado').style.display = (formaPagamento === 'parcelado') ? 'block' : 'none';
-    }
+        // Lógica da Entrada: Só aparece se for Parcelado E o tipo for "Com entrada"
+        if (colEntrada) {
+            if (valPagamento === 'parcelado' && valTipoParcela === 'com_entrada') {
+                colEntrada.style.display = 'block';
+            } else {
+                colEntrada.style.display = 'none';
+                // Limpa o valor da entrada se o campo sumir para não sujar o próximo cálculo
+                const inputEntrada = document.getElementById('valor_entrada');
+                if (inputEntrada) inputEntrada.value = "";
+            }
+        }
 
-    // Lógica para mostrar/esconder campo de entrada
-    if (document.getElementById('col_entrada')) {
-        document.getElementById('col_entrada').style.display = (tipoParcelamento === 'com_entrada') ? 'block' : 'none';
-    }
-
-    executarCalculo();
-});
-
-// 2. Monitora digitação para calcular em tempo real
-document.addEventListener('input', function(e) {
-    if(['qtd_parcelas', 'valor_entrada', 'valor'].includes(e.target.id)) {
+        // Atualiza o cálculo automaticamente ao trocar qualquer opção
         executarCalculo();
-    }
+    });
 });
 
-// 3. Função de Cálculo Corrigida
+// --- 4. FUNÇÃO GLOBAL DE CÁLCULO (VERSÃO CORRIGIDA) ---
 function executarCalculo() {
-    // Pegamos os elementos
+    const fPagamento = document.getElementById('forma_pagamento').value;
+    const elResultado = document.getElementById('valor_calculado_parcela');
+    
+    // TRAVA DE SEGURANÇA: Se não for parcelado, limpa o campo e para o código aqui
+    if (fPagamento !== 'parcelado') {
+        if (elResultado) elResultado.value = ""; 
+        return; 
+    }
+
     const elValorTotal = document.getElementById('valor');
     const elValorEntrada = document.getElementById('valor_entrada');
     const elQtdParcelas = document.getElementById('qtd_parcelas');
     const elTipoParcelamento = document.getElementById('tipo_parcelamento');
-    const elResultado = document.getElementById('valor_calculado_parcela');
 
     if (!elValorTotal || !elResultado) return;
 
-    // Convertemos os valores das máscaras para números decimais
-    const total = parseFloat(elValorTotal.value.replace(/\D/g, "")) / 100 || 0;
-    const entrada = (elTipoParcelamento.value === 'com_entrada') ? (parseFloat(elValorEntrada.value.replace(/\D/g, "")) / 100 || 0) : 0;
+    // Converte a máscara (ex: 1.500,00) em número real (1500.00)
+    const limpar = (val) => parseFloat(val.replace(/\D/g, "")) / 100 || 0;
+
+    const total = limpar(elValorTotal.value);
+    const entrada = (elTipoParcelamento && elTipoParcelamento.value === 'com_entrada') ? limpar(elValorEntrada.value) : 0;
     const qtd = parseInt(elQtdParcelas.value) || 1;
 
-    // Fazemos a conta
+    // Cálculo final
     const resultado = (total - entrada) / qtd;
 
-    // Exibimos o resultado formatado em R$
-    if (resultado > 0) {
-        elResultado.value = resultado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    } else {
-        elResultado.value = "R$ 0,00";
-    }
+    // Exibe formatado como moeda
+    elResultado.value = resultado > 0 
+        ? resultado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
+        : "R$ 0,00";
 }
