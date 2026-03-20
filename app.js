@@ -611,3 +611,80 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.mask-cpf-cnpj').forEach(el => applyMask(el, cpfCnpjMask));
     document.querySelectorAll('.mask-rg').forEach(el => applyMask(el, rgMask));
 });
+
+// Lógica de Janelas e Cálculos de Pagamento
+document.addEventListener('change', function(e) {
+    const totalInput = document.getElementById('valor');
+    const fPagamento = document.getElementById('forma_pagamento').value;
+    const tParcelado = document.getElementById('tipo_parcelado').value;
+    
+    // 1. Controle de Visibilidade das Janelas
+    document.getElementById('win_avista').style.display = (fPagamento === 'avista') ? 'block' : 'none';
+    document.getElementById('win_aprazo').style.display = (fPagamento === 'aprazo') ? 'block' : 'none';
+    document.getElementById('win_parcelado').style.display = (fPagamento === 'parcelado') ? 'block' : 'none';
+
+    // 2. Controle do campo Entrada
+    document.getElementById('group_entrada').style.display = (tParcelado === 'com_entrada') ? 'block' : 'none';
+
+    // 3. Função de Cálculo
+    executarCalculo();
+});
+
+// Listener para o usuário digitar a quantidade ou entrada e o cálculo atualizar na hora
+// 1. Monitora mudanças para mostrar/esconder as janelas e atualizar cálculos
+document.addEventListener('change', function(e) {
+    const formaPagamento = document.getElementById('forma_pagamento').value;
+    const tipoParcelamento = document.getElementById('tipo_parcelamento').value;
+
+    // Lógica para mostrar/esconder as janelas (Wrappers)
+    if (document.getElementById('wrapper_avista')) {
+        document.getElementById('wrapper_avista').style.display = (formaPagamento === 'avista') ? 'block' : 'none';
+    }
+    if (document.getElementById('wrapper_aprazo')) {
+        document.getElementById('wrapper_aprazo').style.display = (formaPagamento === 'aprazo') ? 'block' : 'none';
+    }
+    if (document.getElementById('wrapper_parcelado')) {
+        document.getElementById('wrapper_parcelado').style.display = (formaPagamento === 'parcelado') ? 'block' : 'none';
+    }
+
+    // Lógica para mostrar/esconder campo de entrada
+    if (document.getElementById('col_entrada')) {
+        document.getElementById('col_entrada').style.display = (tipoParcelamento === 'com_entrada') ? 'block' : 'none';
+    }
+
+    executarCalculo();
+});
+
+// 2. Monitora digitação para calcular em tempo real
+document.addEventListener('input', function(e) {
+    if(['qtd_parcelas', 'valor_entrada', 'valor'].includes(e.target.id)) {
+        executarCalculo();
+    }
+});
+
+// 3. Função de Cálculo Corrigida
+function executarCalculo() {
+    // Pegamos os elementos
+    const elValorTotal = document.getElementById('valor');
+    const elValorEntrada = document.getElementById('valor_entrada');
+    const elQtdParcelas = document.getElementById('qtd_parcelas');
+    const elTipoParcelamento = document.getElementById('tipo_parcelamento');
+    const elResultado = document.getElementById('valor_calculado_parcela');
+
+    if (!elValorTotal || !elResultado) return;
+
+    // Convertemos os valores das máscaras para números decimais
+    const total = parseFloat(elValorTotal.value.replace(/\D/g, "")) / 100 || 0;
+    const entrada = (elTipoParcelamento.value === 'com_entrada') ? (parseFloat(elValorEntrada.value.replace(/\D/g, "")) / 100 || 0) : 0;
+    const qtd = parseInt(elQtdParcelas.value) || 1;
+
+    // Fazemos a conta
+    const resultado = (total - entrada) / qtd;
+
+    // Exibimos o resultado formatado em R$
+    if (resultado > 0) {
+        elResultado.value = resultado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    } else {
+        elResultado.value = "R$ 0,00";
+    }
+}
