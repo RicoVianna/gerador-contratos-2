@@ -456,65 +456,82 @@ editBtn.addEventListener('click', () => {
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
-// ---- Fill test data ----
+// ---- Fill test data (VERSÃO CORRIGIDA) ----
 const fillTestBtn = byId('fillTestBtn');
 fillTestBtn.addEventListener('click', () => {
     const tipo = tipoSelect.value;
     const isCV = tipo === 'compravenda';
-
-    const set = (id, v) => { const el = byId(id); if (el) el.value = v; };
+    
+    const set = (id, v) => { 
+        const el = byId(id); 
+        if (el) {
+            el.value = v;
+            // Dispara evento para validar máscaras e cálculos
+            el.dispatchEvent(new Event('input'));
+            el.dispatchEvent(new Event('change'));
+        }
+    };
+    
     const setSelect = (id, v) => {
         const el = byId(id);
         if (!el) return;
         for (const opt of el.options) {
             if (opt.value === v) {
                 opt.selected = true;
+                el.dispatchEvent(new Event('change'));
                 break;
             }
         }
     };
 
-    // Parte A
+    // --- Parte A (Contratante / Comprador) ---
     set('contratante_nome', isCV ? 'Carlos Eduardo Mendes' : 'TechStar Soluções Ltda.');
     set('contratante_nacionalidade', 'brasileiro(a)');
-    set('contratante_profissao', isCV ? 'Empresário' : '');
-    setSelect('contratante_estado_civil', isCV ? 'casado(a)' : '');
-    set('contratante_rg', isCV ? '18.543.291-4' : '');
+    set('contratante_profissao', isCV ? 'Empresário' : 'Tecnologia'); // Preenche Profissão
+    setSelect('contratante_estado_civil', isCV ? 'casado(a)' : 'solteiro(a)'); // Preenche Estado Civil
+    set('contratante_rg', '18.543.291-4'); // Preenche RG
     set('contratante_cpf', isCV ? '321.654.987-00' : '12.345.678/0001-90');
-    set('contratante_endereco', 'Av. Paulista, 1.000, Apto 42, Bela Vista, São Paulo/SP — CEP 01310-100');
+    
+    // Endereço Parte A (Resolvendo CEP e Número)
+    set('contratante_cep', '01310-100'); // Preenche CEP
+    // Simula o preenchimento manual dos campos que o autocomplete traria
+    set('contratante_rua', 'Avenida Paulista');
+    set('contratante_bairro', 'Bela Vista');
+    set('contratante_cidade', 'São Paulo');
+    set('contratante_estado', 'SP');
+    set('contratante_numero', '1000'); // Preenche Número
 
-    // Parte B
+    // --- Parte B (Contratado / Vendedor) ---
     set('contratado_nome', isCV ? 'Ana Paula Ferreira' : 'João da Silva');
     set('contratado_nacionalidade', 'brasileiro(a)');
     set('contratado_profissao', isCV ? 'Professora' : 'Desenvolvedor Web');
     setSelect('contratado_estado_civil', 'solteiro(a)');
     set('contratado_rg', isCV ? '24.198.763-0' : '35.792.461-8');
     set('contratado_cpf', isCV ? '456.789.123-00' : '987.654.321-00');
-    set('contratado_endereco', 'Rua das Flores, 256, Jardim Botânico, Rio de Janeiro/RJ — CEP 22460-040');
+    
+    // Endereço Parte B
+    set('contratado_cep', '22460-040'); // Preenche CEP
+    set('contratado_rua', 'Rua das Flores');
+    set('contratado_bairro', 'Jardim Botânico');
+    set('contratado_cidade', 'Rio de Janeiro');
+    set('contratado_estado', 'RJ');
+    set('contratado_numero', '256'); // Preenche Número
 
-    // Seção 2
+    // --- Seção 2 e Restante ---
     if (isCV) {
-        set('bem_descricao', 'Apartamento residencial com 80m², 2 dormitórios, sala, cozinha e 1 vaga de garagem, localizado na Rua das Acácias, 450, Apto 12, Bloco B, Bairro Jardins, São Paulo/SP. Matrícula nº 12.345 — 1º CRI de São Paulo.');
+        set('bem_descricao', 'Apartamento residencial com 80m², 2 dormitórios...');
         setSelect('estado_bem', 'Seminovo');
-        set('local_entrega', 'No próprio imóvel, Rua das Acácias, 450, Apto 12, São Paulo/SP');
+        set('local_entrega', 'No próprio imóvel, São Paulo/SP');
     } else {
-        set('objeto', 'Desenvolvimento de sistema web completo para gestão de estoque, incluindo: módulo de cadastro de produtos, relatórios gerenciais em PDF, dashboard com gráficos em tempo real, API REST documentada e treinamento da equipe (8 horas).');
+        set('objeto', 'Desenvolvimento de sistema web completo...');
     }
-
+    
     set('valor', '8.500,00');
-    setSelect('forma_pagamento', 'Transferência bancária (TED/PIX)');
-    set('condicoes', isCV ? '30% na assinatura, 70% na entrega das chaves' : '50% na assinatura do contrato e 50% na entrega final');
+    setSelect('forma_pagamento', 'avista'); // Exemplo simples para teste
     set('prazo', isCV ? '60 dias corridos' : '45 dias corridos');
-
-    const today = new Date();
-    set('data', `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
-
-    set('clausulas', isCV
-        ? 'O imóvel será entregue com todas as benfeitorias e sem débitos de IPTU, condomínio ou taxas condominiais em aberto.'
-        : 'Revisões ilimitadas durante o período de desenvolvimento. Suporte técnico gratuito por 30 dias após a entrega.');
     set('local', 'São Paulo/SP');
 
-    // clear invalid styles
+    // Limpa bordas vermelhas de erro
     form.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
 });
 
