@@ -36,6 +36,31 @@ function extenseValue(str) {
     return str ? `R$ ${str}` : '—';
 }
 
+function gerarTextoPagamento(d) {
+    const valorTotal = d.valor || '—';
+    const forma = d.forma_pagamento; 
+    const entrada = d.valor_entrada || '0,00';
+    const qtd = d.qtd_parcelas || '1';
+    const tipoParcela = d.tipo_parcelamento;
+    
+    // Puxa o valor calculado que aparece na tela (ex: R$ 333,33)
+    const valorCadaParcela = document.getElementById('valor_calculado_parcela')?.value || '—';
+
+    if (forma === 'parcelado') {
+        if (tipoParcela === 'com_entrada') {
+            return `o valor total de <strong>R$ ${valorTotal}</strong>, sendo uma <strong>entrada de R$ ${entrada}</strong> e o saldo restante dividido em <strong>${qtd} parcelas de ${valorCadaParcela}</strong>.`;
+        } else {
+            return `o valor total de <strong>R$ ${valorTotal}</strong>, dividido em <strong>${qtd} parcelas de ${valorCadaParcela}</strong>.`;
+        }
+    }
+    
+    if (forma === 'aprazo') {
+        return `o valor total de <strong>R$ ${valorTotal}</strong>, a ser pago integralmente em parcela única.`;
+    }
+
+    return `o valor total de <strong>R$ ${valorTotal}</strong>, pago à vista.`;
+}
+
 function formatDate(dateStr) {
     if (!dateStr) return '—';
     const [y, m, d] = dateStr.split('-');
@@ -135,9 +160,7 @@ function buildPrestacaoServicos(d) {
 
         <div class="clause">
             <p class="clause-title">Cláusula 3ª — Do Valor e da Forma de Pagamento</p>
-            <p>Pela prestação dos serviços ora contratados, o CONTRATANTE pagará ao CONTRATADO o valor total de
-            <strong>${extenseValue(d.valor)}</strong>.</p>
-            <p>Forma de pagamento: <strong>${val(d, 'forma_pagamento')}</strong>.</p>
+            <p>Pela prestação dos serviços ora contratados, o CONTRATANTE pagará ao CONTRATADO ${gerarTextoPagamento(d)}</p>
             ${d.condicoes && d.condicoes.trim() ? `<p>Condições: ${escapeHtml(d.condicoes)}.</p>` : ''}
             <p>O não pagamento nos prazos acordados sujeitará o CONTRATANTE à multa moratória de 2% (dois por cento)
             sobre o valor em aberto, acrescida de juros de 1% (um por cento) ao mês e correção monetária pelo IGPM/FGV.</p>
