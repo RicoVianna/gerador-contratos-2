@@ -677,3 +677,76 @@ h3.preview-title {
         display: none !important;
     }
 }
+
+/* ============================================================
+   AJUSTES DE RESPONSIVIDADE (FOCO EM CELULARES)
+   Este bloco corrige o layout "espremido" e textos verticais
+   ============================================================ */
+
+@media (max-width: 600px) {
+    /* 1. Remove margens laterais e faz o conteúdo ocupar a tela toda */
+    .main-content {
+        margin: 1rem 0 !important;
+        padding: 0 10px !important;
+    }
+
+    /* 2. Garante que os CARDS (áreas brancas) não transbordem */
+    .card, .form-section-block, .fieldset {
+        width: 100% !important;
+        padding: 1.25rem 1rem !important; /* Respiro interno menor para telas finas */
+        margin-bottom: 1.5rem !important;
+        flex: none !important; /* Desativa o flex 50/50 que espreme o texto */
+    }
+
+    /* 3. CORREÇÃO CRITICAL: Transforma colunas em linhas únicas */
+    /* Isso resolve o texto "TIPO DE CONTRATO" e os campos Contratante/Contratado */
+    .tipo-selector-block, 
+    .form-sides-wrapper, 
+    .form-grid, 
+    .form-row, 
+    .form-row-inner, 
+    .address-row-main, 
+    .address-row-city {
+        display: flex !important;
+        flex-direction: column !important; /* Empilha um embaixo do outro */
+        gap: 1rem !important;
+    }
+
+    /* 4. Ajusta o seletor de tipo de contrato (que estava quebrando) */
+    .tipo-select {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* 5. Melhora o espaçamento dos grupos de formulário */
+    .form-group {
+        padding: 0 !important; /* Remove o padding lateral excessivo no celular */
+        margin-bottom: 1.25rem !important;
+    }
+
+    /* 6. Evita o zoom automático no iPhone ao clicar nos campos */
+    input, select, textarea {
+        font-size: 16px !important; /* Mínimo exigido pelo iOS para não dar zoom */
+        padding: 12px !important;    /* Mais fácil de tocar com o dedo */
+    }
+
+    /* 7. Ajuste do Contrato Gerado (Texto do contrato) */
+    .clause, .clause p, #previewSection {
+        font-size: 15px !important; /* Texto legível no celular */
+        text-align: left !important; /* Justificado em tela pequena às vezes cria buracos brancos */
+        line-height: 1.5 !important;
+    }
+
+    /* 8. Faz as assinaturas ocuparem a largura total e centralizarem */
+    .sig-line-container {
+        width: 100% !important;
+        max-width: 280px;
+        margin: 0 auto 30px auto !important;
+    }
+
+    /* 9. Ajusta os botões (WhatsApp, Imprimir, etc) para não ficarem minúsculos */
+    .btn {
+        width: 100% !important; /* Cada botão vira uma linha inteira no celular */
+        margin-bottom: 5px;
+    }
+}
