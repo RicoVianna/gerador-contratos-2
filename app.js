@@ -366,6 +366,35 @@ function collectData(form) {
     return d;
 }
 
+function enviarWhatsappPDF() {
+    const element = document.getElementById('contractOutput');
+    
+    const opt = {
+        margin: [10, 10, 10, 10], // Margens fixas (topo, esquerda, fundo, direita)
+        filename: 'contrato.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            scrollY: 0 // Força o início da captura no topo do elemento
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        // O modo 'avoid-all' abaixo evita que o PDF corte frases ao meio entre as páginas
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    // 1. Gera e baixa o arquivo
+    html2pdf().set(opt).from(element).save().then(() => {
+        // 2. Abre o WhatsApp com a mensagem de orientação
+        const texto = encodeURIComponent("Olá! Segue o contrato em PDF. (Anexe o arquivo 'contrato.pdf' que acabou de ser baixado)");
+        const url = `https://api.whatsapp.com/send?text=${texto}`;
+        
+        window.open(url, '_blank');
+    });
+}
+
+// ... fim da função buildContractHTML ou collectData ...
+
 // ================================================================
 // DOM REFERENCES
 // ================================================================
@@ -455,6 +484,12 @@ printBtn.addEventListener('click', () => window.print());
 editBtn.addEventListener('click', () => {
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
+
+// Ativando o botão de WhatsApp
+const whatsappBtn = byId('whatsappBtn');
+if (whatsappBtn) {
+    whatsappBtn.addEventListener('click', enviarWhatsappPDF);
+}
 
 // ---- Fill test data (VERSÃO CORRIGIDA) ----
 const fillTestBtn = byId('fillTestBtn');

@@ -460,9 +460,12 @@ body {
 }
 
 /* Espaçamento entre as cláusulas */
+/* Espaçamento entre as cláusulas e controle de quebra de página */
 .clause {
     margin-bottom: 1.5rem;
     text-align: justify;
+    /* ADICIONE A LINHA ABAIXO: */
+    page-break-inside: avoid; 
 }
 
 /* Título da Cláusula (Cláusula 1ª — Do Objeto) */
@@ -507,4 +510,45 @@ body {
 .sig-role {
     font-size: 0.85rem;
     color: #333;
+}
+
+/* ===== CONFIGURAÇÃO DE IMPRESSÃO (RESOLVE A ÁREA LARANJA) ===== */
+@media print {
+    /* Esconde o Header, Formulários e Botões */
+    .app-header, .tipo-selector-block, .form-section-block, .btn-row, .preview-toolbar {
+        display: none !important;
+    }
+
+    /* Remove fundos cinzas e sombras para economizar tinta e limpar o visual */
+    body {
+        background: white !important;
+    }
+
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    /* Garante que o Contrato ocupe a página toda e comece do topo */
+    #previewSection {
+        display: block !important;
+        visibility: visible !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    /* Esconde os botões específicos dentro da pré-visualização */
+    #whatsappBtn, #printBtn, #editBtn {
+        display: none !important;
+    }
 }
