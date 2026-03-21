@@ -738,3 +738,30 @@ function executarCalculo() {
         ? resultado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
         : "R$ 0,00";
 }
+
+// --- ATIVAÇÃO DO BOTÃO DE E-MAIL (VERSÃO REVISADA) ---
+document.addEventListener('DOMContentLoaded', function() {
+    const emailBtn = document.getElementById('emailBtn');
+    
+    if (emailBtn) {
+        emailBtn.addEventListener('click', function() {
+            // Puxa o nome do contratante para o assunto
+            const nome = document.getElementById('nome_contratante')?.value || "Cliente";
+            
+            // Texto formatado com quebras de linha (\n)
+            const assunto = encodeURIComponent("Contrato de Prestação de Serviços - " + nome);
+            const corpo = encodeURIComponent(
+                "Olá,\n\n" +
+                "Estou enviando a minuta do contrato para sua conferência.\n" +
+                "Por favor, veja o arquivo PDF em anexo.\n\n" +
+                "Atenciosamente,"
+            );
+            
+            // Comando para abrir o e-mail
+            window.location.href = `mailto:?subject=${assunto}&body=${corpo}`;
+            
+            // Alerta educativo para o usuário
+            alert("Rascunho criado! Agora, salve o PDF do contrato e anexe-o na janela de e-mail que abriu.");
+        });
+    }
+});

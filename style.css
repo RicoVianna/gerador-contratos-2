@@ -1,12 +1,9 @@
 /* ===== RESET & BASE ===== */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
-
 :root {
     --primary: #1a56db;
     --primary-dark: #1346b5;
@@ -33,6 +30,9 @@ body {
     flex-direction: column;
     font-size: 15px;
     line-height: 1.6;
+    width: 100%;
+    overflow-x: hidden; /* Trava qualquer vazamento lateral de elementos */
+    -webkit-font-smoothing: antialiased; /* Deixa as fontes mais nítidas */
 }
 
 /* ===== HEADER ===== */
@@ -252,10 +252,17 @@ body {
     display: flex;
     flex-direction: column;
     gap: .35rem;
-    margin-bottom: .9rem;
     width: 100%;
+    box-sizing: border-box;
+    padding: 0 1.25rem;
+    margin-bottom: 1rem; /* Margem padrão entre os campos */
 }
 
+/* Garante que NADA dentro do form-group escape do limite */
+.form-group > * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
 .form-group:last-child {
     margin-bottom: 0;
 }
@@ -266,19 +273,27 @@ body {
     color: var(--text);
 }
 
-.form-group input,
-.form-group textarea,
+/* A seção branca do formulário */
+.card, .form-section-block {
+    background: #fff;
+    padding-bottom: 2rem; /* O espaço no fundo que você queria */
+    border-radius: 8px;
+    /* ... outras regras de borda/sombra que você já tenha ... */
+}
+
+/* Os campos propriamente ditos */
+.form-group input, 
+.form-group textarea, 
 .form-group select {
+    width: 100%;
+    padding: .65rem 1rem;
     border: 1px solid var(--border);
     border-radius: 7px;
-    padding: .65rem 1rem;
-    font-size: .9rem;
-    font-family: var(--font);
-    color: var(--text);
-    background: #fff;
-    transition: border-color .15s, box-shadow .15s;
-    outline: none;
-    width: 100%;
+    box-sizing: border-box; /* Garante que não vaze para a direita */
+}
+.form-group textarea {
+    resize: vertical; /* Permite aumentar a altura, mas trava a largura em 100% */
+    min-height: 80px;  /* Opcional: define uma altura mínima inicial legal */
 }
 
 .form-group input:focus,
@@ -510,6 +525,116 @@ body {
 .sig-role {
     font-size: 0.85rem;
     color: #333;
+}
+
+/* A "Caixa Mãe": Onde resolvemos o fundo e o respiro final */
+.card, .form-section-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;          /* Espaço equilibrado em cima e nas laterais */
+    padding-bottom: 2.5rem;   /* O respiro maior que você queria no fundo */
+    margin-bottom: 2rem;      /* Distância entre as seções do formulário */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: block;
+    overflow: visible;        /* Garante que sombras e bordas apareçam 100% */
+}
+
+/* Garante que o último campo de cada seção não encoste no fundo */
+.form-group:last-child {
+    margin-bottom: 25px !important;
+}
+
+/* 1. Título: Fica no topo da seção, sozinho */
+h3 {
+    display: block;
+    width: 100%;
+    text-align: left;      /* Alinha o texto à esquerda */
+    padding: 0 1.25rem;    /* Mesmo recuo dos campos do formulário */
+    margin: 3.5rem 0 1rem 0; /* Espaço generoso acima (linha verde) */
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text);
+    text-transform: uppercase;
+}
+
+/* 2. Botões: Ficam embaixo do título, alinhados à esquerda */
+.btn-row, .preview-toolbar {
+    display: flex !important;
+    justify-content: flex-start; /* Alinha os botões à esquerda (linha amarela) */
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    padding: 0 1.25rem;
+    margin-bottom: 3rem !important; /* Espaço antes de começar o contrato */
+}
+
+/* 1. O Título agora EXPULSA os botões para baixo */
+/* ===== SEÇÃO DE PRÉ-VISUALIZAÇÃO (DESIGN FINAL COM CORES) ===== */
+
+/* 1. Título: No topo e alinhado */
+h3.preview-title {
+    display: block;
+    width: 100%;
+    padding: 0 1.25rem !important;
+    margin: 4rem 0 1.5rem 0 !important;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text);
+    text-transform: uppercase;
+}
+
+/* 2. Container dos Botões */
+.preview-toolbar.btn-row {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    padding: 0 1.25rem !important;
+    margin-bottom: 3.5rem !important;
+    justify-content: flex-start;
+}
+
+/* 3. CORES DOS BOTÕES (A parte que você pediu) */
+
+/* WhatsApp: Verde Sucesso */
+.btn-whatsapp {
+    background-color: #25D366 !important;
+    color: white !important;
+}
+.btn-whatsapp:hover {
+    background-color: #128C7E !important;
+}
+
+/*e-mail: azul*/
+/*.btn-email {
+    background-color: #1a56db !important;
+}
+.btn-email:hover {
+    background-color: #1346b5 !important;
+}*/
+
+/* Imprimir/PDF: Cinza Profissional (Sugestão de Designer) */
+.btn-print {
+    background-color: #4b5563 !important;
+    color: white !important;
+}
+.btn-print:hover {
+    background-color: #374151 !important;
+}
+
+/* Editar: Laranja Alerta (Sugestão de Designer) */
+.btn-edit {
+    background-color: #f59e0b !important;
+    color: white !important;
+}
+.btn-edit:hover {
+    background-color: #d97706 !important;
+}
+
+/* 4. Ajuste do papel do contrato */
+#previewSection {
+    padding: 2.5rem 1.25rem !important;
+    border-top: 1px solid var(--border);
+    background: #fff;
 }
 
 /* ===== CONFIGURAÇÃO DE IMPRESSÃO (RESOLVE A ÁREA LARANJA) ===== */
