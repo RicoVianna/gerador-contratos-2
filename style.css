@@ -750,3 +750,14 @@ h3.preview-title {
         margin-bottom: 5px;
     }
 }
+
+.header-inner a {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.header-inner a:active {
+    transform: scale(0.9); /* Dá um efeito de clique no celular */
+}
