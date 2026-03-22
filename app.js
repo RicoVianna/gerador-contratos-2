@@ -449,6 +449,11 @@ const objetoField = byId('objeto');
 
 // ---- Apply tipo switching ----
 function applyTipo(tipo) {
+
+    if (!tipo) {
+        // Opcional: Você pode esconder as seções do formulário aqui se quiser
+        return; 
+    }
     const isCV = tipo === 'compravenda';
 
     tipoIcon.textContent = isCV ? '🏠' : '⚙️';
