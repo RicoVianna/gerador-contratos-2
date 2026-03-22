@@ -639,48 +639,65 @@ h3.preview-title {
 
 /* ===== CONFIGURAÇÃO DE IMPRESSÃO (RESOLVE A ÁREA LARANJA) ===== */
 @media print {
-    /* Esconde o Header, Formulários e Botões */
-    .app-header, .tipo-selector-block, .form-section-block, .btn-row, .preview-toolbar {
+    /* --- 1. CONFIGURAÇÃO DA FOLHA (NOVO) --- */
+    /* Isso remove as margens gigantes que o navegador coloca sozinho */
+    @page {
+        margin: 1cm 1.5cm; 
+    }
+
+    /* --- 2. ESCONDER ELEMENTOS (SEU CÓDIGO + AJUSTES) --- */
+    /* Esconde tudo o que não é o texto do contrato */
+    .app-header, .tipo-selector-block, .form-section-block, .btn-row, .preview-toolbar,
+    #whatsappBtn, #printBtn, #editBtn, .header-inner {
         display: none !important;
     }
 
-    /* Remove fundos cinzas e sombras para economizar tinta e limpar o visual */
-    body {
-        background: white !important;
+    /* --- 3. LIMPEZA VISUAL (SEU CÓDIGO) --- */
+    body { 
+        background: white !important; 
+        width: 100%;
+        margin: 0;
+        padding: 0;
     }
 
-    .main-content {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        max-width: none !important;
+    .card { 
+        box-shadow: none !important; 
+        border: none !important; 
+        padding: 0 !important; 
     }
 
-    .card {
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-    }
-
-    /* Garante que o Contrato ocupe a página toda e comece do topo */
+    /* --- 4. ORGANIZAÇÃO DO TEXTO (NOVO: RESOLVE AS PÁGINAS EM BRANCO) --- */
     #previewSection {
         display: block !important;
         visibility: visible !important;
-        position: absolute;
-        top: 0;
-        left: 0;
         width: 100%;
+        font-size: 11pt; /* Tamanho de letra ideal para documentos */
+        line-height: 1.4; /* Espaço entre linhas para o texto não "vazar" */
     }
 
-    /* Esconde os botões específicos dentro da pré-visualização */
-    #whatsappBtn, #printBtn, #editBtn {
-        display: none !important;
+    /* Impede que uma cláusula seja cortada ao meio se houver espaço na página anterior */
+    .clause, p, .contract-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-bottom: 8px !important;
+    }
+
+    /* Impede que títulos (Cláusula 1ª, etc) fiquem sozinhos no fim da página */
+    h1, h2, h3, strong {
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    /* Garante que as assinaturas não fiquem gigantes na impressão */
+    .sig-line-container {
+        page-break-inside: avoid;
+        margin-top: 20px !important;
     }
 }
 
 /* ============================================================
-   AJUSTES DE RESPONSIVIDADE (FOCO EM CELULARES)
-   Este bloco corrige o layout "espremido" e textos verticais
+    AJUSTES DE RESPONSIVIDADE (FOCO EM CELULARES)
+    Este bloco corrige o layout "espremido" e textos verticais
    ============================================================ */
 
 @media (max-width: 600px) {
