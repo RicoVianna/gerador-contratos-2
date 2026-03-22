@@ -55,7 +55,12 @@ function gerarTextoPagamento(d) {
     }
     
     if (forma === 'aprazo') {
-        return `o valor total de <strong>R$ ${valorTotal}</strong>, a ser pago integralmente em parcela única.`;
+        // Criamos a variável de data apenas aqui dentro
+        // IMPORTANTE: Verifique se o ID no seu HTML é 'data_cheque'
+        const dataPagamento = d.data_cheque || d.data_pagamento || '';
+        const dataTexto = dataPagamento ? `, com vencimento programado para o dia <strong>${formatDate(dataPagamento)}</strong>` : '';
+        
+        return `o valor total de <strong>R$ ${valorTotal}</strong>, a ser pago integralmente em parcela única${dataTexto}.`;
     }
 
     return `o valor total de <strong>R$ ${valorTotal}</strong>, pago à vista.`;
@@ -263,21 +268,20 @@ function buildCompraVenda(d) {
         </div>
 
         <div class="clause">
-            <p class="clause-title">Cláusula 2ª — Do Preço e da Forma de Pagamento</p>
-            <p>O COMPRADOR pagará ao VENDEDOR, a título de preço pela aquisição do bem, o valor total de
-            <strong>${extenseValue(d.valor)}</strong>, mediante <strong>${val(d, 'forma_pagamento')}</strong>.</p>
-            ${d.condicoes && d.condicoes.trim() ? `<p>Condições: ${escapeHtml(d.condicoes)}.</p>` : ''}
-            <p>O VENDEDOR somente estará obrigado a entregar o bem após a confirmação e compensação integral
-            do pagamento ajustado, salvo acordo escrito diverso entre as partes.</p>
-        </div>
-
-        <div class="clause">
-            <p class="clause-title">Cláusula 3ª — Da Entrega e Transferência de Posse</p>
+            <p class="clause-title">Cláusula 2ª — Da Entrega e Transferência de Posse</p>
             <p>A entrega física do bem ao COMPRADOR ocorrerá no prazo de <strong>${val(d, 'prazo')}</strong> a contar
             da data de assinatura deste instrumento (ou da confirmação do pagamento, se posterior), no local:
             <strong>${escapeHtml(localEntrega)}</strong>.</p>
             <p>A transferência da posse e dos riscos sobre o bem opera-se no ato da entrega, a partir do qual o
             COMPRADOR responde por qualquer dano, perda ou deterioração que venha a ocorrer.</p>
+        </div>
+
+        <div class="clause">
+            <p class="clause-title">Cláusula 3ª — Do Preço e da Forma de Pagamento</p>
+            <p>Pela aquisição do bem objeto deste contrato, o COMPRADOR pagará ao VENDEDOR ${gerarTextoPagamento(d)}</p>
+            ${d.condicoes && d.condicoes.trim() ? `<p>Condições: ${escapeHtml(d.condicoes)}.</p>` : ''}
+            <p>O não pagamento nos prazos acordados sujeitará o COMPRADOR à multa moratória de 2% (dois por cento)
+            sobre o valor em aberto, acrescida de juros de 1% (um por cento) ao mês e correção monetária pelo IGPM/FGV.</p>
         </div>
 
         <div class="clause">
