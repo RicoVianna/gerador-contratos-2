@@ -1,3 +1,5 @@
+console.log("SINAL DE VIDA: Versão 3 carregada com sucesso!");
+
 'use strict';
 
 // ---- PWA: register service worker ----
