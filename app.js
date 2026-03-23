@@ -1,5 +1,3 @@
-console.log("SINAL DE VIDA: Versão 3 carregada com sucesso!");
-
 'use strict';
 
 // ---- PWA: register service worker ----
@@ -451,20 +449,26 @@ const objetoField = byId('objeto');
 
 // ---- Apply tipo switching ----
 function applyTipo(tipo) {
-
+    // 1. Se não tiver tipo selecionado, mostra a Engrenagem e para
     if (!tipo) {
-        // Opcional: Você pode esconder as seções do formulário aqui se quiser
+        tipoIcon.textContent = '⚙️';
         return; 
     }
+
+    // 2. Define se o contrato é de Compra e Venda
     const isCV = tipo === 'compravenda';
 
-    tipoIcon.textContent = isCV ? '🏠' : '⚙️';
+    // 3. Define o Ícone: Sempre Folha (📄) se houver algo selecionado
+    // Isso mata a casinha (🏠) de vez
+    tipoIcon.textContent = '📄';
+
+    // 4. Ajusta os textos conforme o tipo de contrato
     legendA.textContent = isCV ? 'Comprador' : 'Contratante';
     legendB.textContent = isCV ? 'Vendedor' : 'Contratado';
     labelSecao2.textContent = isCV ? 'Bem e Valores' : 'Objeto e Valores';
     labelPrazo.textContent = isCV ? 'Prazo para entrega do bem *' : 'Prazo de execução / vigência *';
 
-    // Object / Bem fields
+    // 5. Mostra/Esconde os campos específicos
     if (isCV) {
         wrapObjeto.style.display = 'none';
         wrapBem.style.display = '';
@@ -481,7 +485,6 @@ function applyTipo(tipo) {
         estadoBem.removeAttribute('required');
     }
 }
-
 tipoSelect.addEventListener('change', () => applyTipo(tipoSelect.value));
 
 // Set today's date as default
