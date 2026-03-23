@@ -449,36 +449,37 @@ const objetoField = byId('objeto');
 
 // ---- Apply tipo switching ----
 function applyTipo(tipo) {
-    // 1. Se não tiver tipo selecionado, mostra a Engrenagem e para
     if (!tipo) {
         tipoIcon.textContent = '⚙️';
         return; 
     }
 
-    // 2. Define se o contrato é de Compra e Venda
     const isCV = tipo === 'compravenda';
-
-    // 3. Define o Ícone: Sempre Folha (📄) se houver algo selecionado
-    // Isso mata a casinha (🏠) de vez
     tipoIcon.textContent = '📄';
 
-    // 4. Ajusta os textos conforme o tipo de contrato
     legendA.textContent = isCV ? 'Comprador' : 'Contratante';
     legendB.textContent = isCV ? 'Vendedor' : 'Contratado';
     labelSecao2.textContent = isCV ? 'Bem e Valores' : 'Objeto e Valores';
     labelPrazo.textContent = isCV ? 'Prazo para entrega do bem *' : 'Prazo de execução / vigência *';
 
-    // 5. Mostra/Esconde os campos específicos
     if (isCV) {
         wrapObjeto.style.display = 'none';
-        wrapBem.style.display = '';
+        
+        // ESTA LINHA É A ÚNICA QUE IMPORTA:
+        // Ela força o display e o espaço de 35px no topo
+        wrapBem.style.cssText = "display: block !important; margin-top: 35px !important;";
+        
         wrapBemEstado.style.display = '';
         objetoField.removeAttribute('required');
         bemDescricao.setAttribute('required', '');
         estadoBem.setAttribute('required', '');
     } else {
         wrapObjeto.style.display = '';
+        
+        // Quando volta para serviços, removemos o espaço extra
         wrapBem.style.display = 'none';
+        wrapBem.style.marginTop = '0';
+        
         wrapBemEstado.style.display = 'none';
         objetoField.setAttribute('required', '');
         bemDescricao.removeAttribute('required');
@@ -802,3 +803,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+

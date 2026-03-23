@@ -97,9 +97,13 @@ body {
 
 /* ===== PAGE SECTION TITLE ===== */
 .section-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text);
+    display: block !important;
+    font-size: 2.1rem !important; /* Aumento de ~80% em relação ao original */
+    font-weight: 850 !important;  /* Deixa a letra bem encorpada */
+    color: var(--text) !important;
+    margin-bottom: 2rem !important; /* Cria o respiro necessário antes da caixa do seletor */
+    letter-spacing: -0.5px !important; /* Estilo moderno de título principal */
+    line-height: 1.2 !important;
 }
 
 /* ===== TIPO DE CONTRATO SELECTOR ===== */
@@ -778,3 +782,4 @@ h3.preview-title {
 .header-inner a:active {
     transform: scale(0.9); /* Dá um efeito de clique no celular */
 }
+
